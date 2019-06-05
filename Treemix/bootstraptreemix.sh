@@ -15,7 +15,7 @@
 # output: name of the output directory
 
 infile=${1:-"*.tmix.gz"}
-outgroup=${2:-""}
+outgroup=${2}
 bootstraps=${3:-"1000"}
 blocksize=${4:-"1"}
 output=${5:-"treemixout"}
@@ -24,10 +24,10 @@ output=${5:-"treemixout"}
 # If outgroup is present, then run treemix with outgroup
 # If no outgroup is assigned, no outgroup for treemix
 mkdir $output
-if [ -n $outgroup ]; then 
+if [[ $outgroup ]]; then 
     treemix -i $infile -root $outgroup -o originaltree
 else
-    treemix -i $infile -o $bt
+    treemix -i $infile -o originaltree
 fi
 gunzip -k originaltree.treeout.gz
 mv originaltree* $output
@@ -35,7 +35,7 @@ mv originaltree* $output
 # To run treemix with bootstrap replicates
 # If outgroup is present, then run treemix with outgroup
 # If no outgroup is assigned, no outgroup for treemix
-if [ -n $outgroup ]; then 
+if [[ $outgroup ]]; then 
     for ((bt=1;bt<=$bootstraps;bt++)); 
     do 
     treemix -i $infile -root $outgroup -bootstrap -k $blocksize -o btreplicate$bt
@@ -44,13 +44,13 @@ if [ -n $outgroup ]; then
 else
     for ((bt=1;bt<=$bootstraps;bt++)); 
     do 
-    treemix -i $infile -bootstrap -k $blocksize -o $bt
+    treemix -i $infile -bootstrap -k $blocksize -o btreplicate$bt
     done
 fi
 
 # move all bootstrap replicates into output file
 mkdir bootstrap_replicates
-mv btreplicate* bootstrap_replicates
+mv *btreplicate* bootstrap_replicates
 
 # concatenate the bootstrap replicates into cattree file
 # first to unzip the bt replicates
